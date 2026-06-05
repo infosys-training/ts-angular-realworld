@@ -1,54 +1,41 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { ArticleListConfig } from '../models/article-list-config.model';
-import { Article } from '../models/article.model';
+import { api } from '../../../core/api';
+import type { ArticleListConfig } from '../models/article-list-config.model';
+import type { Article } from '../models/article.model';
 
-@Injectable({ providedIn: 'root' })
-export class ArticlesService {
-  constructor(private readonly http: HttpClient) {}
+export const articlesService = {
+  query(config: ArticleListConfig): Promise<{ articles: Article[]; articlesCount: number }> {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(config.filters)) {
+      if (value !== undefined) {
+        params.set(key, String(value));
+      }
+    }
+    const queryString = params.toString();
+    const path = '/articles' + (config.type === 'feed' ? '/feed' : '') + (queryString ? `?${queryString}` : '');
+    return api.get(path);
+  },
 
-  query(config: ArticleListConfig): Observable<{ articles: Article[]; articlesCount: number }> {
-    // Convert any filters over to Angular's URLSearchParams
-    let params = new HttpParams();
+  get(slug: string): Promise<Article> {
+    return api.get<{ article: Article }>(`/articles/${slug}`).then(data => data.article);
+  },
 
-    Object.keys(config.filters).forEach(key => {
-      // @ts-ignore
-      params = params.set(key, config.filters[key]);
-    });
+  delete(slug: string): Promise<void> {
+    return api.delete(`/articles/${slug}`);
+  },
 
-    return this.http.get<{ articles: Article[]; articlesCount: number }>(
-      '/articles' + (config.type === 'feed' ? '/feed' : ''),
-      { params },
-    );
-  }
+  create(article: Partial<Article>): Promise<Article> {
+    return api.post<{ article: Article }>('/articles/', { article }).then(data => data.article);
+  },
 
-  get(slug: string): Observable<Article> {
-    return this.http.get<{ article: Article }>(`/articles/${slug}`).pipe(map(data => data.article));
-  }
+  update(article: Partial<Article>): Promise<Article> {
+    return api.put<{ article: Article }>(`/articles/${article.slug}`, { article }).then(data => data.article);
+  },
 
-  delete(slug: string): Observable<void> {
-    return this.http.delete<void>(`/articles/${slug}`);
-  }
+  favorite(slug: string): Promise<Article> {
+    return api.post<{ article: Article }>(`/articles/${slug}/favorite`, {}).then(data => data.article);
+  },
 
-  create(article: Partial<Article>): Observable<Article> {
-    return this.http.post<{ article: Article }>('/articles/', { article: article }).pipe(map(data => data.article));
-  }
-
-  update(article: Partial<Article>): Observable<Article> {
-    return this.http
-      .put<{ article: Article }>(`/articles/${article.slug}`, {
-        article: article,
-      })
-      .pipe(map(data => data.article));
-  }
-
-  favorite(slug: string): Observable<Article> {
-    return this.http.post<{ article: Article }>(`/articles/${slug}/favorite`, {}).pipe(map(data => data.article));
-  }
-
-  unfavorite(slug: string): Observable<void> {
-    return this.http.delete<void>(`/articles/${slug}/favorite`);
-  }
-}
+  unfavorite(slug: string): Promise<void> {
+    return api.delete(`/articles/${slug}/favorite`);
+  },
+};

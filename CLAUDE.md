@@ -1,4 +1,4 @@
-# Angular RealWorld Example App
+# React RealWorld Example App
 
 ## Commands
 
