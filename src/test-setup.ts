@@ -1,16 +1,13 @@
-import 'zone.js';
-import 'zone.js/testing';
 import { getTestBed } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 
-console.log('🚀 Test setup file is being loaded!');
-
-// Initialize the Angular testing environment once
+// Initialize the Angular testing environment once (zoneless)
 try {
   getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
     teardown: { destroyAfterEach: true },
+    providers: [provideZonelessChangeDetection()],
   });
-  console.log('✅ TestBed initialized successfully');
 } catch (error) {
-  console.error('❌ TestBed initialization failed:', error);
+  console.error('TestBed initialization failed:', error);
 }
