@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TagsService } from '../../services/tags.service';
 import { ArticleListConfig } from '../../models/article-list-config.model';
@@ -7,7 +8,6 @@ import { ArticleListComponent } from '../../components/article-list.component';
 import { combineLatest } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { UserService } from '../../../../core/auth/services/user.service';
-import { RxLet } from '@rx-angular/template/let';
 import { IfAuthenticatedDirective } from '../../../../core/auth/if-authenticated.directive';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -15,7 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'app-home-page',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  imports: [NgClass, ArticleListComponent, RxLet, IfAuthenticatedDirective, RouterLink],
+  imports: [NgClass, ArticleListComponent, IfAuthenticatedDirective, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class HomeComponent implements OnInit {
@@ -25,9 +25,12 @@ export default class HomeComponent implements OnInit {
     filters: {},
   });
   currentPage = signal(1);
-  tags$ = inject(TagsService)
-    .getAll()
-    .pipe(tap(() => this.tagsLoaded.set(true)));
+  tags = toSignal(
+    inject(TagsService)
+      .getAll()
+      .pipe(tap(() => this.tagsLoaded.set(true))),
+    { initialValue: [] as string[] },
+  );
   tagsLoaded = signal(false);
   isFollowingFeed = signal(false);
   destroyRef = inject(DestroyRef);
