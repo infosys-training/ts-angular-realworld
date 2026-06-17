@@ -5,7 +5,7 @@ import { LocationService } from './location.service';
 import { PotholeService } from './pothole.service';
 import { PotholeAlert, GeoLocation } from '../models/pothole.model';
 
-const DEFAULT_ALERT_RADIUS = 200; // meters
+const DEFAULT_ALERT_RADIUS = 500; // meters
 const CHECK_INTERVAL = 3000; // ms
 
 @Injectable({ providedIn: 'root' })
