@@ -1,0 +1,95 @@
+<app-alert-notification />
+
+<div class="pothole-page">
+  <div class="container">
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+      <h1>&#128739; Pothole Alert System</h1>
+      <p>Stay safe on the road. Get real-time alerts for upcoming potholes while driving.</p>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number">{{ totalPotholes() }}</div>
+        <div class="stat-label">Total Reports</div>
+      </div>
+      <div class="stat-card stat-active">
+        <div class="stat-number">{{ activePotholes() }}</div>
+        <div class="stat-label">Active Potholes</div>
+      </div>
+      <div class="stat-card stat-nearby">
+        <div class="stat-number">{{ nearbyPotholes() }}</div>
+        <div class="stat-label">Nearby (&lt;500m)</div>
+      </div>
+      <div class="stat-card stat-tracking">
+        <div class="stat-number">
+          @if (tracking$ | async) {
+            ON
+          } @else {
+            OFF
+          }
+        </div>
+        <div class="stat-label">GPS Tracking</div>
+      </div>
+    </div>
+
+    <!-- Location Error -->
+    @if (locationError$ | async; as error) {
+      <div class="error-banner">&#9888; {{ error }}</div>
+    }
+
+    <!-- Action Buttons -->
+    <div class="action-row">
+      <a class="btn btn-primary btn-action" routerLink="/report"> &#10133; Report Pothole </a>
+      <a class="btn btn-secondary btn-action" routerLink="/potholes"> &#128203; View All Potholes </a>
+      <button class="btn btn-action" [class.btn-tracking-on]="tracking$ | async" (click)="toggleTracking()">
+        @if (tracking$ | async) {
+          &#128308; Stop Tracking
+        } @else {
+          &#128994; Start Tracking
+        }
+      </button>
+    </div>
+
+    <!-- Map -->
+    <div class="map-wrapper">
+      <h2>Live Map</h2>
+      <div class="map-frame">
+        <app-pothole-map #mapRef [potholes]="(potholes$ | async) ?? []" />
+      </div>
+    </div>
+
+    <!-- Recent Potholes -->
+    @if (potholes$ | async; as potholes) {
+      @if (potholes.length > 0) {
+        <div class="recent-section">
+          <h2>Recently Reported</h2>
+          <div class="pothole-cards">
+            @for (pothole of potholes.slice(0, 5); track pothole.id) {
+              <div class="pothole-card" [class]="getSeverityClass(pothole)">
+                <div class="pothole-card-header">
+                  <span class="severity-badge">{{ pothole.severity | uppercase }}</span>
+                  @if (pothole.resolved) {
+                    <span class="resolved-badge">RESOLVED</span>
+                  }
+                </div>
+                <p class="pothole-description">{{ pothole.description || 'No description provided' }}</p>
+                <div class="pothole-meta">
+                  <span
+                    >&#128205; {{ pothole.location.lat | number: '1.4-4' }},
+                    {{ pothole.location.lng | number: '1.4-4' }}</span
+                  >
+                  <span>&#128197; {{ pothole.reportedAt | date: 'short' }}</span>
+                </div>
+              </div>
+            }
+          </div>
+          @if (potholes.length > 5) {
+            <a routerLink="/potholes" class="view-all-link">View all {{ potholes.length }} reports &rarr;</a>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<div class="pothole-page">
+  <div class="container">
+    <div class="page-header">
+      <a routerLink="/" class="back-link">&larr; Back to Dashboard</a>
+      <h1>&#128203; All Reported Potholes</h1>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="filter-tab" [class.active]="filterMode() === 'all'" (click)="setFilter('all')">All</button>
+      <button class="filter-tab" [class.active]="filterMode() === 'active'" (click)="setFilter('active')">
+        Active
+      </button>
+      <button class="filter-tab" [class.active]="filterMode() === 'resolved'" (click)="setFilter('resolved')">
+        Resolved
+      </button>
+    </div>
+
+    @if (potholes$ | async; as potholes) {
+      @if (getFilteredPotholes(potholes).length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">&#128739;</div>
+          <h3>No potholes found</h3>
+          <p>
+            @if (filterMode() === 'all') {
+              No potholes have been reported yet. Be the first to report one!
+            } @else {
+              No {{ filterMode() }} potholes found.
+            }
+          </p>
+          <a routerLink="/report" class="btn btn-primary">Report a Pothole</a>
+        </div>
+      } @else {
+        <div class="pothole-table">
+          @for (pothole of getFilteredPotholes(potholes); track pothole.id) {
+            <div class="pothole-row" [class.resolved]="pothole.resolved">
+              <div class="row-severity">
+                <span class="severity-dot severity-{{ pothole.severity }}"></span>
+                <span class="severity-text">{{ pothole.severity | uppercase }}</span>
+              </div>
+              <div class="row-details">
+                <div class="row-description">
+                  @switch (pothole.lanePosition) {
+                    @case ('left') {
+                      <span class="lane-badge">&#11013;&#65039; Left</span>
+                    }
+                    @case ('right') {
+                      <span class="lane-badge">&#10145;&#65039; Right</span>
+                    }
+                    @default {
+                      <span class="lane-badge">&#9898; Center</span>
+                    }
+                  }
+                  {{ pothole.description || 'No description' }}
+                </div>
+                <div class="row-meta">
+                  <span
+                    >&#128205; {{ pothole.location.lat | number: '1.4-4' }},
+                    {{ pothole.location.lng | number: '1.4-4' }}</span
+                  >
+                  <span>&#128207; {{ getDistance(pothole) }}</span>
+                  <span>&#128197; {{ pothole.reportedAt | date: 'medium' }}</span>
+                  <span>&#128100; {{ pothole.reportedBy }}</span>
+                </div>
+              </div>
+              <div class="row-actions">
+                <button
+                  class="btn btn-sm"
+                  [class.btn-resolve]="!pothole.resolved"
+                  [class.btn-unresolve]="pothole.resolved"
+                  (click)="toggleResolved(pothole.id)"
+                >
+                  @if (pothole.resolved) {
+                    Reopen
+                  } @else {
+                    &#9989; Resolve
+                  }
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="remove(pothole.id)">&#128465; Delete</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>

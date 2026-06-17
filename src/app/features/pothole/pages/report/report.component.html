@@ -1,0 +1,99 @@
+<div class="pothole-page">
+  <div class="container">
+    <div class="page-header">
+      <a routerLink="/" class="back-link">&larr; Back to Dashboard</a>
+      <h1>&#128679; Report a Pothole</h1>
+      <p>Help other drivers by reporting potholes on the road.</p>
+    </div>
+
+    @if (submitted()) {
+      <div class="success-banner">&#9989; Pothole reported successfully! Redirecting to dashboard...</div>
+    } @else {
+      <div class="report-form-layout">
+        <!-- Map Section -->
+        <div class="map-section">
+          <h3>Select Location</h3>
+          <p class="hint-text">Click on the map to select the pothole location, or use your current location.</p>
+          <button class="btn btn-secondary btn-sm" (click)="useCurrentLocation()">
+            &#128205; Use My Current Location
+          </button>
+
+          @if (selectedLocation(); as loc) {
+            <div class="selected-location">
+              Selected: {{ loc.lat | number: '1.6-6' }}, {{ loc.lng | number: '1.6-6' }}
+            </div>
+          }
+
+          <div class="map-frame map-frame-report">
+            <app-pothole-map [clickable]="true" (mapClick)="onMapClick($event)" />
+          </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+          <h3>Pothole Details</h3>
+
+          <div class="form-group">
+            <label for="severity">Severity Level</label>
+            <select
+              id="severity"
+              class="form-control"
+              [ngModel]="severity()"
+              (ngModelChange)="onSeverityChange($event)"
+            >
+              <option value="low">Low - Minor bump</option>
+              <option value="medium">Medium - Noticeable hazard</option>
+              <option value="high">High - Dangerous, avoid!</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="lanePosition">Position on Road</label>
+            <select
+              id="lanePosition"
+              class="form-control"
+              [ngModel]="lanePosition()"
+              (ngModelChange)="onLanePositionChange($event)"
+            >
+              <option value="left">&#11013;&#65039; Left side of road</option>
+              <option value="center">&#9898; Center of road</option>
+              <option value="right">&#10145;&#65039; Right side of road</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea
+              id="description"
+              class="form-control"
+              rows="3"
+              placeholder="Describe the pothole (size, depth, location details...)"
+              [ngModel]="description()"
+              (ngModelChange)="description.set($event)"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="reporter">Your Name (optional)</label>
+            <input
+              id="reporter"
+              type="text"
+              class="form-control"
+              placeholder="Anonymous"
+              [ngModel]="reporterName()"
+              (ngModelChange)="reporterName.set($event)"
+            />
+          </div>
+
+          <button class="btn btn-primary btn-lg btn-submit" (click)="submit()" [disabled]="!selectedLocation()">
+            &#128680; Submit Report
+          </button>
+
+          @if (!selectedLocation()) {
+            <p class="hint-text">Please select a location on the map first.</p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
