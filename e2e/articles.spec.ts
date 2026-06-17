@@ -20,7 +20,7 @@ test.describe('Pothole Reporting', () => {
   test('should show hint text when no location selected', async ({ page }) => {
     await page.goto('/report');
 
-    await expect(page.locator('.hint-text')).toContainText('select a location');
+    await expect(page.locator('.form-section .hint-text')).toContainText('select a location');
   });
 
   test('severity dropdown should have three options', async ({ page }) => {
