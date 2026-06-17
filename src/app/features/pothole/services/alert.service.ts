@@ -77,30 +77,18 @@ export class AlertService implements OnDestroy {
 
     const potholes = this.potholeService.getActivePotholes();
     const radius = this.alertRadius$.getValue();
-    const newAlerts: PotholeAlert[] = [];
 
-    for (const pothole of potholes) {
-      const distance = this.locationService.calculateDistance(location, pothole.location);
-      if (distance <= radius && !this.alertedIds.has(pothole.id)) {
-        const alert: PotholeAlert = {
-          pothole,
-          distance: Math.round(distance),
-          timestamp: new Date().toISOString(),
-        };
-        newAlerts.push(alert);
-        this.alertedIds.add(pothole.id);
-        this.playAlertSound();
-      }
+    // Auto-dismiss alerts for potholes the driver has passed
+    const currentAlerts = this.activeAlerts$.getValue();
+    const stillRelevant = currentAlerts.filter(a => {
+      const dist = this.locationService.calculateDistance(location, a.pothole.location);
+      return dist <= radius * 2;
+    });
+    if (stillRelevant.length !== currentAlerts.length) {
+      this.activeAlerts$.next(stillRelevant);
     }
 
-    if (newAlerts.length > 0) {
-      const currentAlerts = this.activeAlerts$.getValue();
-      this.activeAlerts$.next([...newAlerts, ...currentAlerts]);
-
-      const currentHistory = this.alertHistory$.getValue();
-      this.alertHistory$.next([...newAlerts, ...currentHistory].slice(0, 50));
-    }
-
+    // Clean up alertedIds for resolved/deleted/far-away potholes
     this.alertedIds.forEach(id => {
       const pothole = potholes.find(p => p.id === id);
       if (!pothole) {
@@ -112,6 +100,33 @@ export class AlertService implements OnDestroy {
         }
       }
     });
+
+    // Only alert for the nearest pothole that hasn't been alerted yet
+    if (this.activeAlerts$.getValue().length > 0) return;
+
+    let nearest: { pothole: (typeof potholes)[0]; distance: number } | null = null;
+
+    for (const pothole of potholes) {
+      if (this.alertedIds.has(pothole.id)) continue;
+      const distance = this.locationService.calculateDistance(location, pothole.location);
+      if (distance <= radius && (!nearest || distance < nearest.distance)) {
+        nearest = { pothole, distance };
+      }
+    }
+
+    if (nearest) {
+      const alert: PotholeAlert = {
+        pothole: nearest.pothole,
+        distance: Math.round(nearest.distance),
+        timestamp: new Date().toISOString(),
+      };
+      this.alertedIds.add(nearest.pothole.id);
+      this.activeAlerts$.next([alert]);
+      this.playAlertSound();
+
+      const currentHistory = this.alertHistory$.getValue();
+      this.alertHistory$.next([alert, ...currentHistory].slice(0, 50));
+    }
   }
 
   private playAlertSound(): void {
