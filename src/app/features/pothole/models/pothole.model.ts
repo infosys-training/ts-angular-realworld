@@ -1,4 +1,5 @@
 export type SeverityLevel = 'low' | 'medium' | 'high';
+export type LanePosition = 'left' | 'center' | 'right';
 
 export interface GeoLocation {
   lat: number;
@@ -9,6 +10,7 @@ export interface Pothole {
   id: string;
   location: GeoLocation;
   severity: SeverityLevel;
+  lanePosition: LanePosition;
   description: string;
   reportedAt: string;
   reportedBy: string;

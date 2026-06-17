@@ -53,10 +53,21 @@ import { AlertService } from '../../services/alert.service';
       color: #dc2626;
     }
 
+    .alert-lane {
+      font-size: 14px;
+      font-weight: 700;
+      color: #991b1b;
+      margin-top: 4px;
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 6px;
+      display: inline-block;
+    }
+
     .alert-description {
       font-size: 12px;
       color: #7f1d1d;
-      margin-top: 2px;
+      margin-top: 4px;
     }
 
     .alert-dismiss {

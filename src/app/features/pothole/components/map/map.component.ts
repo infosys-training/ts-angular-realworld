@@ -10,7 +10,7 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import * as L from 'leaflet';
-import { GeoLocation, Pothole, SeverityLevel } from '../../models/pothole.model';
+import { GeoLocation, LanePosition, Pothole, SeverityLevel } from '../../models/pothole.model';
 import { LocationService } from '../../services/location.service';
 import { Subscription } from 'rxjs';
 
@@ -18,6 +18,12 @@ const SEVERITY_COLORS: Record<SeverityLevel, string> = {
   low: '#f59e0b',
   medium: '#f97316',
   high: '#ef4444',
+};
+
+const LANE_LABELS: Record<LanePosition, string> = {
+  left: '⬅️ Left side',
+  center: '⚪ Center',
+  right: '➡️ Right side',
 };
 
 const VALID_SEVERITIES = new Set<string>(['low', 'medium', 'high']);
@@ -89,9 +95,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       const safeDescription = escapeHtml(pothole.description || 'No description');
       const safeDate = escapeHtml(new Date(pothole.reportedAt).toLocaleDateString());
 
+      const safeLane = LANE_LABELS[pothole.lanePosition] || LANE_LABELS['center'];
+
       marker.bindPopup(
         `<div style="font-family: sans-serif; min-width: 150px;">
           <strong style="color: ${SEVERITY_COLORS[safeSeverity as SeverityLevel]}; text-transform: uppercase;">${escapeHtml(safeSeverity)} severity</strong>
+          <p style="margin: 4px 0; font-weight: 600;">${escapeHtml(safeLane)}</p>
           <p style="margin: 4px 0;">${safeDescription}</p>
           <small style="color: #666;">Reported: ${safeDate}</small>
         </div>`,

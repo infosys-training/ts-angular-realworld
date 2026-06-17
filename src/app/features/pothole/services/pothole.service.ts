@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Pothole, GeoLocation, SeverityLevel } from '../models/pothole.model';
+import { Pothole, GeoLocation, SeverityLevel, LanePosition } from '../models/pothole.model';
 
 const STORAGE_KEY = 'pothole_alerts_data';
 
@@ -20,11 +20,18 @@ export class PotholeService {
     return this.potholes$.getValue();
   }
 
-  addPothole(location: GeoLocation, severity: SeverityLevel, description: string, reportedBy: string): Pothole {
+  addPothole(
+    location: GeoLocation,
+    severity: SeverityLevel,
+    description: string,
+    reportedBy: string,
+    lanePosition: LanePosition = 'center',
+  ): Pothole {
     const pothole: Pothole = {
       id: crypto.randomUUID(),
       location,
       severity,
+      lanePosition,
       description,
       reportedAt: new Date().toISOString(),
       reportedBy: reportedBy || 'Anonymous',
@@ -60,18 +67,26 @@ export class PotholeService {
       if (data) {
         const parsed = JSON.parse(data);
         const valid = Array.isArray(parsed)
-          ? parsed.filter(
-              (p): p is Pothole =>
-                p != null &&
-                typeof p.id === 'string' &&
-                p.location != null &&
-                typeof p.location.lat === 'number' &&
-                typeof p.location.lng === 'number' &&
-                typeof p.severity === 'string' &&
-                typeof p.resolved === 'boolean',
-            )
+          ? parsed
+              .filter((p: unknown): boolean => {
+                if (p == null || typeof p !== 'object') return false;
+                const r = p as Record<string, unknown>;
+                const loc = r['location'] as Record<string, unknown> | null;
+                return (
+                  typeof r['id'] === 'string' &&
+                  loc != null &&
+                  typeof loc['lat'] === 'number' &&
+                  typeof loc['lng'] === 'number' &&
+                  typeof r['severity'] === 'string' &&
+                  typeof r['resolved'] === 'boolean'
+                );
+              })
+              .map((p: unknown) => {
+                const rec = p as Pothole;
+                return { ...rec, lanePosition: rec.lanePosition || 'center' };
+              })
           : [];
-        this.potholes$.next(valid);
+        this.potholes$.next(valid as Pothole[]);
       }
     } catch {
       this.potholes$.next([]);

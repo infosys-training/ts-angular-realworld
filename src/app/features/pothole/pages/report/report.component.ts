@@ -5,7 +5,7 @@ import { DecimalPipe } from '@angular/common';
 import { PotholeService } from '../../services/pothole.service';
 import { LocationService } from '../../services/location.service';
 import { MapComponent } from '../../components/map/map.component';
-import { GeoLocation, SeverityLevel } from '../../models/pothole.model';
+import { GeoLocation, SeverityLevel, LanePosition } from '../../models/pothole.model';
 
 @Component({
   selector: 'app-report-pothole',
@@ -22,6 +22,7 @@ export default class ReportComponent {
 
   selectedLocation = signal<GeoLocation | null>(null);
   severity = signal<SeverityLevel>('medium');
+  lanePosition = signal<LanePosition>('center');
   description = signal<string>('');
   reporterName = signal<string>('');
   submitted = signal<boolean>(false);
@@ -41,11 +42,15 @@ export default class ReportComponent {
     this.severity.set(value as SeverityLevel);
   }
 
+  onLanePositionChange(value: string): void {
+    this.lanePosition.set(value as LanePosition);
+  }
+
   submit(): void {
     const loc = this.selectedLocation();
     if (!loc) return;
 
-    this.potholeService.addPothole(loc, this.severity(), this.description(), this.reporterName());
+    this.potholeService.addPothole(loc, this.severity(), this.description(), this.reporterName(), this.lanePosition());
     this.submitted.set(true);
 
     setTimeout(() => {

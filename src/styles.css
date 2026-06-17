@@ -1831,6 +1831,18 @@ footer .attribution {
   margin-bottom: 0.25rem;
 }
 
+.lane-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #e0f2fe;
+  color: #0369a1;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
 .row-meta {
   display: flex;
   gap: 1rem;

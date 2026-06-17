@@ -7,6 +7,19 @@
           <div class="alert-content">
             <div class="alert-title">POTHOLE AHEAD!</div>
             <div class="alert-distance">{{ alert.distance }}m away</div>
+            <div class="alert-lane">
+              @switch (alert.pothole.lanePosition) {
+                @case ('left') {
+                  &#11013;&#65039; On LEFT side of road
+                }
+                @case ('right') {
+                  &#10145;&#65039; On RIGHT side of road
+                }
+                @default {
+                  &#9898; In CENTER of road
+                }
+              }
+            </div>
             <div class="alert-description">
               {{ alert.pothole.severity | uppercase }} severity
               @if (alert.pothole.description) {
