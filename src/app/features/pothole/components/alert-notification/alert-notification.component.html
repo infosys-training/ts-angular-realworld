@@ -1,0 +1,22 @@
+@if (alerts$ | async; as alerts) {
+  @if (alerts.length > 0) {
+    <div class="alert-overlay">
+      @for (alert of alerts; track alert.pothole.id) {
+        <div class="alert-card">
+          <span class="alert-icon">&#9888;</span>
+          <div class="alert-content">
+            <div class="alert-title">POTHOLE AHEAD!</div>
+            <div class="alert-distance">{{ alert.distance }}m away</div>
+            <div class="alert-description">
+              {{ alert.pothole.severity | uppercase }} severity
+              @if (alert.pothole.description) {
+                &mdash; {{ alert.pothole.description }}
+              }
+            </div>
+          </div>
+          <button class="alert-dismiss" (click)="dismiss(alert.pothole.id)" title="Dismiss">&times;</button>
+        </div>
+      }
+    </div>
+  }
+}
