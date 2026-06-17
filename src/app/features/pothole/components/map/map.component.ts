@@ -20,6 +20,14 @@ const SEVERITY_COLORS: Record<SeverityLevel, string> = {
   high: '#ef4444',
 };
 
+const VALID_SEVERITIES = new Set<string>(['low', 'medium', 'high']);
+
+function escapeHtml(text: string): string {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(text));
+  return div.innerHTML;
+}
+
 @Component({
   selector: 'app-pothole-map',
   templateUrl: './map.component.html',
@@ -78,11 +86,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         fillOpacity: 0.85,
       }).addTo(this.map);
 
+      const safeSeverity = VALID_SEVERITIES.has(pothole.severity) ? pothole.severity : 'low';
+      const safeDescription = escapeHtml(pothole.description || 'No description');
+      const safeDate = escapeHtml(new Date(pothole.reportedAt).toLocaleDateString());
+
       marker.bindPopup(
         `<div style="font-family: sans-serif; min-width: 150px;">
-          <strong style="color: ${SEVERITY_COLORS[pothole.severity]}; text-transform: uppercase;">${pothole.severity} severity</strong>
-          <p style="margin: 4px 0;">${pothole.description || 'No description'}</p>
-          <small style="color: #666;">Reported: ${new Date(pothole.reportedAt).toLocaleDateString()}</small>
+          <strong style="color: ${SEVERITY_COLORS[safeSeverity as SeverityLevel]}; text-transform: uppercase;">${escapeHtml(safeSeverity)} severity</strong>
+          <p style="margin: 4px 0;">${safeDescription}</p>
+          <small style="color: #666;">Reported: ${safeDate}</small>
         </div>`,
       );
 

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, OnDestroy, viewChild } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, OnDestroy, viewChild, signal } from '@angular/core';
 import { AsyncPipe, UpperCasePipe, DecimalPipe, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LocationService } from '../../services/location.service';
@@ -30,9 +30,9 @@ export default class DashboardComponent implements OnInit, OnDestroy {
   alertsEnabled$ = this.alertService.enabled;
   alertRadius$ = this.alertService.alertRadius;
 
-  totalPotholes = 0;
-  activePotholes = 0;
-  nearbyPotholes = 0;
+  totalPotholes = signal(0);
+  activePotholes = signal(0);
+  nearbyPotholes = signal(0);
 
   ngOnInit(): void {
     this.locationService.startTracking();
@@ -41,12 +41,14 @@ export default class DashboardComponent implements OnInit, OnDestroy {
     this.subscription.add(
       combineLatest([this.potholeService.allPotholes, this.locationService.location]).subscribe(
         ([potholes, location]) => {
-          this.totalPotholes = potholes.length;
-          this.activePotholes = potholes.filter(p => !p.resolved).length;
-          this.nearbyPotholes = location
-            ? potholes.filter(p => !p.resolved && this.locationService.calculateDistance(location, p.location) <= 500)
-                .length
-            : 0;
+          this.totalPotholes.set(potholes.length);
+          this.activePotholes.set(potholes.filter(p => !p.resolved).length);
+          this.nearbyPotholes.set(
+            location
+              ? potholes.filter(p => !p.resolved && this.locationService.calculateDistance(location, p.location) <= 500)
+                  .length
+              : 0,
+          );
 
           const map = this.mapComponent();
           if (map) map.updatePotholeMarkers(potholes);
@@ -60,7 +62,7 @@ export default class DashboardComponent implements OnInit, OnDestroy {
   }
 
   toggleTracking(): void {
-    if (this.locationService.currentSnapshot) {
+    if (this.locationService.isTrackingSnapshot) {
       this.locationService.stopTracking();
       this.alertService.stopMonitoring();
     } else {

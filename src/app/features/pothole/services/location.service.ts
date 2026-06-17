@@ -26,6 +26,10 @@ export class LocationService {
     return this.currentLocation$.getValue();
   }
 
+  get isTrackingSnapshot(): boolean {
+    return this.tracking$.getValue();
+  }
+
   startTracking(): void {
     if (this.watchId !== null) return;
     if (!('geolocation' in navigator)) {

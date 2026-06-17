@@ -11,15 +11,15 @@
     <!-- Stats Row -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-number">{{ totalPotholes }}</div>
+        <div class="stat-number">{{ totalPotholes() }}</div>
         <div class="stat-label">Total Reports</div>
       </div>
       <div class="stat-card stat-active">
-        <div class="stat-number">{{ activePotholes }}</div>
+        <div class="stat-number">{{ activePotholes() }}</div>
         <div class="stat-label">Active Potholes</div>
       </div>
       <div class="stat-card stat-nearby">
-        <div class="stat-number">{{ nearbyPotholes }}</div>
+        <div class="stat-number">{{ nearbyPotholes() }}</div>
         <div class="stat-label">Nearby (&lt;500m)</div>
       </div>
       <div class="stat-card stat-tracking">

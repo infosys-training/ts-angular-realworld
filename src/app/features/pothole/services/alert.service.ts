@@ -126,6 +126,7 @@ export class AlertService implements OnDestroy {
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
       oscillator.start(ctx.currentTime);
       oscillator.stop(ctx.currentTime + 0.5);
+      oscillator.onended = () => ctx.close();
     } catch {
       // Audio not available
     }

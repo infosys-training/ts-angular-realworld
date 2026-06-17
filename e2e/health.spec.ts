@@ -11,24 +11,25 @@ test.describe('Health Checks', () => {
     await expect(page.locator('nav.navbar')).toBeVisible();
   });
 
-  test('API should be accessible', async ({ request }) => {
-    const response = await request.get('https://api.realworld.show/api/tags');
-    expect(response.ok()).toBeTruthy();
+  test('can navigate to report page', async ({ page }) => {
+    await page.goto('/report');
+
+    // Should see report page heading
+    await expect(page.locator('h1')).toContainText('Report a Pothole', { timeout: 10000 });
   });
 
-  test('can navigate to login page', async ({ page }) => {
-    await page.goto('/login');
+  test('can navigate to pothole list page', async ({ page }) => {
+    await page.goto('/potholes');
 
-    // Should see login form
-    await expect(page.locator('h1')).toContainText('Sign in', { timeout: 10000 });
-    await expect(page.locator('input[formControlName="email"]')).toBeVisible();
+    // Should see pothole list heading
+    await expect(page.locator('h1')).toContainText('All Reported Potholes', { timeout: 10000 });
   });
 
-  test('can navigate to register page', async ({ page }) => {
-    await page.goto('/register');
+  test('unknown routes redirect to dashboard', async ({ page }) => {
+    await page.goto('/nonexistent-page');
 
-    // Should see register form
-    await expect(page.locator('h1')).toContainText('Sign up', { timeout: 10000 });
-    await expect(page.locator('input[formControlName="username"]')).toBeVisible();
+    // Should be redirected to dashboard
+    await expect(page).toHaveURL('/');
+    await expect(page.locator('.hero-banner')).toBeVisible();
   });
 });
