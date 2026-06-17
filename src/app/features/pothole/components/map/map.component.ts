@@ -77,16 +77,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.potholeMarkers = [];
 
     for (const pothole of potholes) {
+      const safeSeverity = (VALID_SEVERITIES.has(pothole.severity) ? pothole.severity : 'low') as SeverityLevel;
       const marker = L.circleMarker([pothole.location.lat, pothole.location.lng], {
-        radius: pothole.severity === 'high' ? 12 : pothole.severity === 'medium' ? 10 : 8,
-        fillColor: SEVERITY_COLORS[pothole.severity],
+        radius: safeSeverity === 'high' ? 12 : safeSeverity === 'medium' ? 10 : 8,
+        fillColor: SEVERITY_COLORS[safeSeverity],
         color: '#fff',
         weight: 2,
         opacity: 1,
         fillOpacity: 0.85,
       }).addTo(this.map);
-
-      const safeSeverity = VALID_SEVERITIES.has(pothole.severity) ? pothole.severity : 'low';
       const safeDescription = escapeHtml(pothole.description || 'No description');
       const safeDate = escapeHtml(new Date(pothole.reportedAt).toLocaleDateString());
 

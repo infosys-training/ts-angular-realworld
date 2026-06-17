@@ -101,10 +101,11 @@ export class AlertService implements OnDestroy {
       this.alertHistory$.next([...newAlerts, ...currentHistory].slice(0, 50));
     }
 
-    // Clear alerts for potholes now far away
     this.alertedIds.forEach(id => {
       const pothole = potholes.find(p => p.id === id);
-      if (pothole) {
+      if (!pothole) {
+        this.alertedIds.delete(id);
+      } else {
         const dist = this.locationService.calculateDistance(location, pothole.location);
         if (dist > radius * 2) {
           this.alertedIds.delete(id);

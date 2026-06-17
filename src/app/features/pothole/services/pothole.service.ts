@@ -58,8 +58,20 @@ export class PotholeService {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
       if (data) {
-        const parsed: Pothole[] = JSON.parse(data);
-        this.potholes$.next(parsed);
+        const parsed = JSON.parse(data);
+        const valid = Array.isArray(parsed)
+          ? parsed.filter(
+              (p): p is Pothole =>
+                p != null &&
+                typeof p.id === 'string' &&
+                p.location != null &&
+                typeof p.location.lat === 'number' &&
+                typeof p.location.lng === 'number' &&
+                typeof p.severity === 'string' &&
+                typeof p.resolved === 'boolean',
+            )
+          : [];
+        this.potholes$.next(valid);
       }
     } catch {
       this.potholes$.next([]);
