@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import { useAuth } from '../../../../core/auth/auth.context';
 import { articlesService } from '../../services/articles.service';
 import { commentsService } from '../../services/comments.service';
@@ -48,7 +49,7 @@ export default function ArticlePage() {
   const bodyHtml = useMemo(() => {
     if (!article) return '';
     const raw = marked.parse(article.body);
-    return typeof raw === 'string' ? raw : '';
+    return typeof raw === 'string' ? DOMPurify.sanitize(raw) : '';
   }, [article]);
 
   const onToggleFavorite = (favorited: boolean) => {

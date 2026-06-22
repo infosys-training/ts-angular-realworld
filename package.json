@@ -28,6 +28,7 @@
   "private": true,
   "dependencies": {
     "axios": "^1.7.9",
+    "dompurify": "^3.4.11",
     "marked": "^17.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -37,6 +38,7 @@
     "@playwright/test": "^1.58.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
+    "@types/dompurify": "^3.2.0",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
