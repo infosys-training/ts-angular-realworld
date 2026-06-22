@@ -55,6 +55,7 @@ export default function Auth() {
                     <input
                       className="form-control form-control-lg"
                       type="text"
+                      name="username"
                       placeholder="Username"
                       value={username}
                       onChange={e => setUsername(e.target.value)}
@@ -65,6 +66,7 @@ export default function Auth() {
                   <input
                     className="form-control form-control-lg"
                     type="text"
+                    name="email"
                     placeholder="Email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
@@ -74,6 +76,7 @@ export default function Auth() {
                   <input
                     className="form-control form-control-lg"
                     type="password"
+                    name="password"
                     placeholder="Password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}

@@ -82,6 +82,7 @@ export default function Editor() {
                   <input
                     className="form-control form-control-lg"
                     type="text"
+                    name="title"
                     placeholder="Article Title"
                     value={title}
                     onChange={e => setTitle(e.target.value)}
@@ -92,6 +93,7 @@ export default function Editor() {
                   <input
                     className="form-control"
                     type="text"
+                    name="description"
                     placeholder="What's this article about?"
                     value={description}
                     onChange={e => setDescription(e.target.value)}
@@ -101,6 +103,7 @@ export default function Editor() {
                 <fieldset className="form-group">
                   <textarea
                     className="form-control"
+                    name="body"
                     rows={8}
                     placeholder="Write your article (in markdown)"
                     value={body}
