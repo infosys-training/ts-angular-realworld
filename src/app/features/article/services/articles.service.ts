@@ -1,54 +1,45 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import api from '../../../core/api';
 import { ArticleListConfig } from '../models/article-list-config.model';
 import { Article } from '../models/article.model';
 
-@Injectable({ providedIn: 'root' })
-export class ArticlesService {
-  constructor(private readonly http: HttpClient) {}
+export const articlesService = {
+  async query(config: ArticleListConfig): Promise<{ articles: Article[]; articlesCount: number }> {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(config.filters)) {
+      if (value !== undefined) {
+        params.set(key, String(value));
+      }
+    }
+    const url = '/articles' + (config.type === 'feed' ? '/feed' : '');
+    const { data } = await api.get<{ articles: Article[]; articlesCount: number }>(url, { params });
+    return data;
+  },
 
-  query(config: ArticleListConfig): Observable<{ articles: Article[]; articlesCount: number }> {
-    // Convert any filters over to Angular's URLSearchParams
-    let params = new HttpParams();
+  async get(slug: string): Promise<Article> {
+    const { data } = await api.get<{ article: Article }>(`/articles/${slug}`);
+    return data.article;
+  },
 
-    Object.keys(config.filters).forEach(key => {
-      // @ts-ignore
-      params = params.set(key, config.filters[key]);
-    });
+  async delete(slug: string): Promise<void> {
+    await api.delete(`/articles/${slug}`);
+  },
 
-    return this.http.get<{ articles: Article[]; articlesCount: number }>(
-      '/articles' + (config.type === 'feed' ? '/feed' : ''),
-      { params },
-    );
-  }
+  async create(article: Partial<Article>): Promise<Article> {
+    const { data } = await api.post<{ article: Article }>('/articles/', { article });
+    return data.article;
+  },
 
-  get(slug: string): Observable<Article> {
-    return this.http.get<{ article: Article }>(`/articles/${slug}`).pipe(map(data => data.article));
-  }
+  async update(article: Partial<Article>): Promise<Article> {
+    const { data } = await api.put<{ article: Article }>(`/articles/${article.slug}`, { article });
+    return data.article;
+  },
 
-  delete(slug: string): Observable<void> {
-    return this.http.delete<void>(`/articles/${slug}`);
-  }
+  async favorite(slug: string): Promise<Article> {
+    const { data } = await api.post<{ article: Article }>(`/articles/${slug}/favorite`, {});
+    return data.article;
+  },
 
-  create(article: Partial<Article>): Observable<Article> {
-    return this.http.post<{ article: Article }>('/articles/', { article: article }).pipe(map(data => data.article));
-  }
-
-  update(article: Partial<Article>): Observable<Article> {
-    return this.http
-      .put<{ article: Article }>(`/articles/${article.slug}`, {
-        article: article,
-      })
-      .pipe(map(data => data.article));
-  }
-
-  favorite(slug: string): Observable<Article> {
-    return this.http.post<{ article: Article }>(`/articles/${slug}/favorite`, {}).pipe(map(data => data.article));
-  }
-
-  unfavorite(slug: string): Observable<void> {
-    return this.http.delete<void>(`/articles/${slug}/favorite`);
-  }
-}
+  async unfavorite(slug: string): Promise<void> {
+    await api.delete(`/articles/${slug}/favorite`);
+  },
+};
