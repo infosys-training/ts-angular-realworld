@@ -1,0 +1,8 @@
+incident_management/
+tests/
+*.py
+alembic.ini
+Dockerfile
+docker-compose.yml
+requirements.txt
+run.py

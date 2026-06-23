@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Incident #{{ incident.id }} - Incident Management{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>Incident #{{ incident.id }}: {{ incident.title }}</h2>
+  <a href="/incidents" class="btn btn-secondary">Back to List</a>
+</div>
+
+<div class="card">
+  <div class="detail-grid">
+    <div class="detail-item">
+      <div class="label">Status</div>
+      <div class="value"><span class="badge badge-{{ incident.status.value }}">{{ incident.status.value }}</span></div>
+    </div>
+    <div class="detail-item">
+      <div class="label">Priority</div>
+      <div class="value"><span class="badge badge-{{ incident.priority.value }}">{{ incident.priority.value }}</span></div>
+    </div>
+    <div class="detail-item">
+      <div class="label">Assignee</div>
+      <div class="value">{{ incident.assignee.full_name if incident.assignee else "Unassigned" }}</div>
+    </div>
+    <div class="detail-item">
+      <div class="label">Created</div>
+      <div class="value">{{ incident.created_at.strftime('%Y-%m-%d %H:%M UTC') }}</div>
+    </div>
+    <div class="detail-item">
+      <div class="label">Last Updated</div>
+      <div class="value">{{ incident.updated_at.strftime('%Y-%m-%d %H:%M UTC') }}</div>
+    </div>
+  </div>
+
+  {% if incident.description %}
+  <div style="margin-top: 1.5rem;">
+    <div class="label">Description</div>
+    <div class="description-text">{{ incident.description }}</div>
+  </div>
+  {% endif %}
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+  <div class="card">
+    <h2>Update Status</h2>
+    <form method="post" action="/incidents/{{ incident.id }}/status">
+      <div class="form-group">
+        <label>New Status</label>
+        <select name="status">
+          <option value="open" {% if incident.status.value == "open" %}selected{% endif %}>Open</option>
+          <option value="in_progress" {% if incident.status.value == "in_progress" %}selected{% endif %}>In Progress</option>
+          <option value="resolved" {% if incident.status.value == "resolved" %}selected{% endif %}>Resolved</option>
+          <option value="closed" {% if incident.status.value == "closed" %}selected{% endif %}>Closed</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-success">Update Status</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Assign Incident</h2>
+    <form method="post" action="/incidents/{{ incident.id }}/assign">
+      <div class="form-group">
+        <label>Assign To</label>
+        <select name="assignee_id">
+          <option value="">Unassigned</option>
+          {% for user in users %}
+          <option value="{{ user.id }}" {% if incident.assignee_id == user.id %}selected{% endif %}>{{ user.full_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-success">Assign</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Incident Management{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <h1>Incident Management</h1>
+      <nav>
+        <a href="/">Dashboard</a>
+        <a href="/incidents">Incidents</a>
+        <a href="/incidents/new">New Incident</a>
+        <a href="/users">Users</a>
+        <a href="/users/new">New User</a>
+        <a href="/docs" target="_blank">API Docs</a>
+      </nav>
+    </div>
+    <div class="container">
+      {% if message %}
+      <div class="alert alert-success">{{ message }}</div>
+      {% endif %} {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+      {% endif %} {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>
