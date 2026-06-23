@@ -1,6 +1,11 @@
-from fastapi import FastAPI
+from pathlib import Path
 
-from .routes import incidents, users
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+
+from .routes import incidents, users, web
+
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 app = FastAPI(
     title="Incident Management API",
@@ -8,10 +13,8 @@ app = FastAPI(
     version="1.0.0",
 )
 
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
 app.include_router(users.router, prefix="/api")
 app.include_router(incidents.router, prefix="/api")
-
-
-@app.get("/")
-def health_check():
-    return {"status": "healthy", "service": "Incident Management API"}
+app.include_router(web.router)
