@@ -54,4 +54,6 @@ def downgrade() -> None:
     op.drop_table('incidents')
     op.drop_index(op.f('ix_users_id'), table_name='users')
     op.drop_table('users')
+    op.execute('DROP TYPE IF EXISTS incidentstatus')
+    op.execute('DROP TYPE IF EXISTS incidentpriority')
     # ### end Alembic commands ###

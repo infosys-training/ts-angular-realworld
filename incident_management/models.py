@@ -39,7 +39,7 @@ class Incident(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[IncidentStatus] = mapped_column(
         Enum(IncidentStatus), default=IncidentStatus.OPEN, nullable=False
     )

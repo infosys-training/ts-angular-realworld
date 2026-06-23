@@ -92,7 +92,8 @@ def search_incidents(
     if assignee_id is not None:
         query = query.filter(Incident.assignee_id == assignee_id)
     if search:
-        pattern = f"%{search}%"
+        escaped = search.replace("%", "\\%").replace("_", "\\_")
+        pattern = f"%{escaped}%"
         query = query.filter(
             Incident.title.ilike(pattern) | Incident.description.ilike(pattern)
         )
