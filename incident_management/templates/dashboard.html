@@ -43,8 +43,8 @@
       <tr>
         <td>#{{ incident.id }}</td>
         <td><a href="/incidents/{{ incident.id }}">{{ incident.title }}</a></td>
-        <td><span class="badge badge-{{ incident.status }}">{{ incident.status }}</span></td>
-        <td><span class="badge badge-{{ incident.priority }}">{{ incident.priority }}</span></td>
+        <td><span class="badge badge-{{ incident.status.value }}">{{ incident.status.value }}</span></td>
+        <td><span class="badge badge-{{ incident.priority.value }}">{{ incident.priority.value }}</span></td>
         <td>{{ incident.assignee.full_name if incident.assignee else "Unassigned" }}</td>
         <td>{{ incident.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
         <td>
