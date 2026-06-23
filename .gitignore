@@ -47,3 +47,9 @@ yarn-error.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env

@@ -1,0 +1,20 @@
+from fastapi import FastAPI
+
+from .database import Base, engine
+from .routes import incidents, users
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="Incident Management API",
+    description="REST API for managing incidents with PostgreSQL",
+    version="1.0.0",
+)
+
+app.include_router(users.router, prefix="/api")
+app.include_router(incidents.router, prefix="/api")
+
+
+@app.get("/")
+def health_check():
+    return {"status": "healthy", "service": "Incident Management API"}
